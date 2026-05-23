@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tubebox - Watch & Upload Videos</title>
+    <title>Diskly - Watch & Upload Videos</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome -->
@@ -19,8 +19,8 @@
         <div class="container">
             <div class="custom-nav-container w-100 d-flex justify-content-between align-items-center">
                 <a class="navbar-brand fw-bold text-white fs-4 d-flex align-items-center gap-2" href="#">
-                    <i class="fa-solid fa-play text-highlight"></i>
-                    <span>Tube<span class="text-highlight">box</span></span>
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Diskly Logo" style="height: 32px;" class="me-2">
+                    <span>Disk<span class="text-highlight">ly</span></span>
                 </a>
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNav">
@@ -43,7 +43,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="/contact">Contact Us</a>
                         </li>
-                        
+                        <li class="nav-item">
+                            <button class="theme-toggle-btn me-2 mt-1" id="theme-toggle" aria-label="Toggle Theme">
+                                <i class="fa-solid fa-moon"></i>
+                            </button>
+                        </li>
                         <li class="nav-item">
     <a class="btn btn-sm btn-green-custom rounded-pill px-3 py-2" href="/app">
         Download App
@@ -176,9 +180,9 @@
                 <div class="col-lg-5">
                     <div
                         class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill border border-success border-opacity-25 bg-success bg-opacity-10 text-highlight mb-3 small fw-semibold">
-                        <i class="fa-solid fa-play"></i> Tubebox Exclusive
+                        <i class="fa-solid fa-play"></i> Diskly Exclusive
                     </div>
-                    <h2 class="display-6 fw-bold mb-4">See How Tubebox Works</h2>
+                    <h2 class="display-6 fw-bold mb-4">See How Diskly Works</h2>
                     <p class="text-light opacity-75 mb-4">Watch our quick tutorial to learn how you can start watching
                         movies or uploading your own content via Telegram in seconds. Our platform is designed for
                         simplicity and speed.</p>
@@ -207,137 +211,161 @@
         </div>
     </section>
 
-    <!-- How It Works Section -->
-    <section class="py-5">
-        <div class="container py-5 text-center">
-            <p class="text-highlight fw-semibold tracking-widest text-uppercase small mb-2">How It Works</p>
-            <h2 class="display-5 fw-bold mb-3">Upload, Watch & Manage</h2>
-            <p class="text-white mx-auto mb-5" style="max-width: 600px;">Creators upload content seamlessly, consumers
-                access it instantly, and admins manage everything from a single dashboard.</p>
+    <!-- New Platform Overview Sections -->
+    <section class="py-5 mt-4">
+        <div class="container text-center mb-5 pb-4">
+            <p class="text-light opacity-75 mx-auto fs-5" style="max-width: 800px;">
+                Upload from your Dashboard, share via Telegram Bots, and let consumers access content on the mobile app — all connected seamlessly.
+            </p>
+        </div>
 
-            <div class="row g-4 justify-content-center pt-4">
-                <!-- Step 1 -->
-                <div class="col-md-3 col-sm-6">
-                    <div class="position-relative">
-                        <div class="step-icon-bg mx-auto mb-4 d-flex align-items-center justify-content-center rounded-circle bg-dark border border-success border-opacity-25"
-                            style="width: 80px; height: 80px;">
-                            <i class="fa-solid fa-cloud-arrow-up fa-2x text-primary-green"></i>
-                            <span
-                                class="position-absolute top-0 start-50 translate-middle-x badge rounded-pill bg-primary-green text-white"
-                                style="margin-top: -10px;">01</span>
-                        </div>
-                        <h5 class="fw-bold">Upload</h5>
-                        <p class="text-white small px-2">Upload any video via Telegram bots or Admin panel</p>
-                    </div>
+        <!-- Dashboard Section -->
+        <div class="container mb-5 pb-5">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7">
+                    <img src="{{ url_for('static', filename='images/project_dashboard_1777254417715.png') }}" class="img-fluid rounded-4 shadow-lg border border-secondary border-opacity-25" alt="Dashboard Showcase">
                 </div>
-                <!-- Step 2 -->
-                <div class="col-md-3 col-sm-6">
-                    <div class="position-relative">
-                        <div class="step-icon-bg mx-auto mb-4 d-flex align-items-center justify-content-center rounded-circle bg-dark border border-success border-opacity-25"
-                            style="width: 80px; height: 80px;">
-                            <i class="fa-solid fa-share-nodes fa-2x text-primary-green"></i>
-                            <span
-                                class="position-absolute top-0 start-50 translate-middle-x badge rounded-pill bg-primary-green text-white"
-                                style="margin-top: -10px;">02</span>
-                        </div>
-                        <h5 class="fw-bold">Share</h5>
-                        <p class="text-white small px-2">Share the video links directly with your audience</p>
+                <div class="col-lg-5 ps-lg-5">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 bg-black border border-success border-opacity-25 mb-4" style="width: 48px; height: 48px;">
+                        <i class="fa-solid fa-table-columns text-primary-green fs-5"></i>
                     </div>
+                    <h2 class="display-6 fw-bold mb-2 text-white">Dashboard</h2>
+                    <p class="text-primary-green fw-bold tracking-wider text-uppercase small mb-4">For Publishers</p>
+                    <p class="text-light opacity-75 mb-5 fs-6" style="line-height: 1.7;">
+                        Upload files, manage branding, and oversee account settings — all from one centralized platform with intuitive controls and seamless navigation.
+                    </p>
+                    <a href="/login" class="btn btn-primary-green rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 fw-semibold">
+                        Go To Dashboard <i class="fa-solid fa-arrow-right"></i>
+                    </a>
                 </div>
-                <!-- Step 3 -->
-                <div class="col-md-3 col-sm-6">
-                    <div class="position-relative">
-                        <div class="step-icon-bg mx-auto mb-4 d-flex align-items-center justify-content-center rounded-circle bg-dark border border-success border-opacity-25"
-                            style="width: 80px; height: 80px;">
-                            <i class="fa-solid fa-play fa-2x text-primary-green"></i>
-                            <span
-                                class="position-absolute top-0 start-50 translate-middle-x badge rounded-pill bg-primary-green text-white"
-                                style="margin-top: -10px;">03</span>
-                        </div>
-                        <h5 class="fw-bold">Watch</h5>
-                        <p class="text-white small px-2">Consumers enjoy seamless, fast video streaming</p>
+            </div>
+        </div>
+
+        <!-- Mobile App Section -->
+        <div class="container mb-5 pb-5">
+            <div class="row align-items-center flex-column-reverse flex-lg-row g-5">
+                <div class="col-lg-5 pe-lg-5 text-lg-start text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 bg-black border border-success border-opacity-25 mb-4" style="width: 48px; height: 48px;">
+                        <i class="fa-solid fa-mobile-screen text-primary-green fs-5"></i>
                     </div>
+                    <h2 class="display-6 fw-bold mb-2 text-white">Mobile App</h2>
+                    <p class="text-primary-green fw-bold tracking-wider text-uppercase small mb-4">For Consumers</p>
+                    <p class="text-light opacity-75 mb-5 fs-6" style="line-height: 1.7;">
+                        Access uploaded files on the go with a user-friendly interface. Swift file retrieval and seamless navigation, wherever you are.
+                    </p>
+                    <a href="/app" class="btn btn-primary-green rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 fw-semibold">
+                        Download Mobile App <i class="fa-solid fa-arrow-right"></i>
+                    </a>
                 </div>
-                <!-- Step 4 -->
-                <div class="col-md-3 col-sm-6">
-                    <div class="position-relative">
-                        <div class="step-icon-bg mx-auto mb-4 d-flex align-items-center justify-content-center rounded-circle bg-dark border border-success border-opacity-25"
-                            style="width: 80px; height: 80px;">
-                            <i class="fa-solid fa-user-shield fa-2x text-primary-green"></i>
-                            <span
-                                class="position-absolute top-0 start-50 translate-middle-x badge rounded-pill bg-primary-green text-white"
-                                style="margin-top: -10px;">04</span>
-                        </div>
-                        <h5 class="fw-bold">Manage</h5>
-                        <p class="text-white small px-2">1 Admin controls the entire platform effortlessly</p>
+                <div class="col-lg-7 text-center">
+                    <img src="{{ url_for('static', filename='images/project_app_1777254402487.png') }}" class="img-fluid rounded-4 shadow-lg border border-secondary border-opacity-25" alt="Mobile App Showcase" style="max-height: 500px; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Telegram Channel Section -->
+        <div class="container mb-5 pb-5">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6 text-center">
+                    <img src="{{ url_for('static', filename='images/hero_portrait_1777254387208.png') }}" class="img-fluid rounded-4 shadow-lg border border-secondary border-opacity-25" alt="Telegram Channel Showcase" style="max-height: 500px; object-fit: contain;">
+                </div>
+                <div class="col-lg-6 ps-lg-5 text-lg-start text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 bg-black border border-success border-opacity-25 mb-4" style="width: 48px; height: 48px;">
+                        <i class="fa-brands fa-telegram text-primary-green fs-4"></i>
                     </div>
+                    <h2 class="display-6 fw-bold mb-2 text-white">Telegram Channel</h2>
+                    <p class="text-primary-green fw-bold tracking-wider text-uppercase small mb-4">Community & Support</p>
+                    <p class="text-light opacity-75 mb-5 fs-6" style="line-height: 1.7;">
+                        Discover link converter bots, get support, and stay updated with the latest developments. Join us to streamline your link sharing experience.
+                    </p>
+                    <a href="/telegram" class="btn btn-primary-green rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 fw-semibold">
+                        Join Telegram Channel <i class="fa-solid fa-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Split -->
-    <section class="py-5 bg-black bg-opacity-50">
-        <div class="container py-4">
-            <div class="row g-4">
-                <!-- For Creators -->
-                <div class="col-md-6">
-                    <div
-                        class="bg-dark bg-opacity-50 rounded-4 p-4 p-md-5 border border-secondary border-opacity-25 h-100">
+    <!-- Comparison Table Section -->
+    <section class="py-5 bg-black bg-opacity-25">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="display-6 fw-bold mb-3 text-uppercase tracking-wider text-primary-green">Diskly VS Others</h2>
+                <p class="text-light opacity-75 mx-auto" style="max-width: 650px;">
+                    Features you won't find on any other platform — built exclusively for creator transparency, monetization, and growth.
+                </p>
+            </div>
 
-                        <p class="text-white fw-bold text-uppercase small mb-2">
-                            <i class="fa-solid fa-video me-2 text-white"></i>
-                            For Creators
-                        </p>
-                        <h3 class="fw-bold mb-3">Publishers</h3>
-                        <p class="text-white opacity-75 mb-4">Upload videos easily and reach a wider audience.</p>
-
-                        <ul class="list-unstyled mb-0 d-flex flex-column gap-3">
-                            <li class="d-flex align-items-center gap-3"><i
-                                    class="fa-solid fa-circle-check text-primary-green fs-5"></i> <span
-                                    class="text-light opacity-90 fw-medium">Telegram Bot Uploads</span></li>
-                            <li class="d-flex align-items-center gap-3"><i
-                                    class="fa-solid fa-circle-check text-primary-green fs-5"></i> <span
-                                    class="text-light opacity-90 fw-medium">Unlimited Storage</span></li>
-                            <li class="d-flex align-items-center gap-3"><i
-                                    class="fa-solid fa-circle-check text-primary-green fs-5"></i> <span
-                                    class="text-light opacity-90 fw-medium">Realtime View Count</span></li>
-                            <li class="d-flex align-items-center gap-3"><i
-                                    class="fa-solid fa-circle-check text-primary-green fs-5"></i> <span
-                                    class="text-light opacity-90 fw-medium">Fast Processing</span></li>
-                            <li class="d-flex align-items-center gap-3"><i
-                                    class="fa-solid fa-circle-check text-primary-green fs-5"></i> <span
-                                    class="text-light opacity-90 fw-medium">Admin Approvals</span></li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- For Viewers -->
-                <div class="col-md-6">
-                    <div
-                        class="bg-dark bg-opacity-50 rounded-4 p-4 p-md-5 border border-secondary border-opacity-25 h-100">
-                        <p class="text-white fw-bold text-uppercase small mb-2"><i
-                                class="fa-solid fa-mobile-screen me-2"></i> For Viewers</p>
-                        <h3 class="fw-bold mb-3">Consumers</h3>
-                        <p class="text-light opacity-75 mb-4">Watch, discover, and enjoy content seamlessly.</p>
-
-                        <ul class="list-unstyled mb-0 d-flex flex-column gap-3">
-                            <li class="d-flex align-items-center gap-3"><i
-                                    class="fa-solid fa-circle-check text-primary-green fs-5"></i> <span
-                                    class="text-light opacity-90 fw-medium">Fast Video Streaming</span></li>
-                            <li class="d-flex align-items-center gap-3"><i
-                                    class="fa-solid fa-circle-check text-primary-green fs-5"></i> <span
-                                    class="text-light opacity-90 fw-medium">No SignUp Required</span></li>
-                            <li class="d-flex align-items-center gap-3"><i
-                                    class="fa-solid fa-circle-check text-primary-green fs-5"></i> <span
-                                    class="text-light opacity-90 fw-medium">Advanced Video Player</span></li>
-                            <li class="d-flex align-items-center gap-3"><i
-                                    class="fa-solid fa-circle-check text-primary-green fs-5"></i> <span
-                                    class="text-light opacity-90 fw-medium">Direct Link to App</span></li>
-                            <li class="d-flex align-items-center gap-3"><i
-                                    class="fa-solid fa-circle-check text-primary-green fs-5"></i> <span
-                                    class="text-light opacity-90 fw-medium">Minimal Ads</span></li>
-                        </ul>
-                    </div>
+            <div class="bg-black bg-opacity-50 rounded-4 border border-secondary border-opacity-25 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table custom-comparison-table align-middle text-center mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-start py-4 ps-4 border-bottom border-secondary border-opacity-25 text-white opacity-75 w-25">Feature</th>
+                                <th class="py-4 border-bottom border-secondary border-opacity-25 text-primary-green fw-bold w-25">Diskly</th>
+                                <th class="py-4 border-bottom border-secondary border-opacity-25 text-white opacity-75 w-25">Cloud Storage Platforms</th>
+                                <th class="py-4 border-bottom border-secondary border-opacity-25 text-white opacity-75 w-25">File Hosting Sites</th>
+                            </tr>
+                        </thead>
+                        <tbody class="border-top-0">
+                            <tr>
+                                <td class="text-start py-4 ps-4 border-bottom border-secondary border-opacity-25 opacity-90 fw-medium text-white">
+                                    Unlimited View Count <span class="badge badge-custom rounded-pill ms-2" style="font-size: 0.65rem;">Exclusive</span>
+                                </td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-check text-primary-green fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-start py-4 ps-4 border-bottom border-secondary border-opacity-25 opacity-90 fw-medium text-white">
+                                    Live View Tracking <span class="badge badge-custom rounded-pill ms-2" style="font-size: 0.65rem;">Exclusive</span>
+                                </td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-check text-primary-green fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-start py-4 ps-4 border-bottom border-secondary border-opacity-25 opacity-90 fw-medium text-white">
+                                    OG Uploader Referral (5% Bonus) <span class="badge badge-custom rounded-pill ms-2" style="font-size: 0.65rem;">Exclusive</span>
+                                </td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-check text-primary-green fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-start py-4 ps-4 border-bottom border-secondary border-opacity-25 opacity-90 fw-medium text-white">
+                                    Monetization from 1st View <span class="badge badge-custom rounded-pill ms-2" style="font-size: 0.65rem;">Exclusive</span>
+                                </td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-check text-primary-green fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-start py-4 ps-4 border-bottom border-secondary border-opacity-25 opacity-90 fw-medium text-white">
+                                    No Subscriber/View Threshold <span class="badge badge-custom rounded-pill ms-2" style="font-size: 0.65rem;">Exclusive</span>
+                                </td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-check text-primary-green fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-start py-4 ps-4 border-bottom border-secondary border-opacity-25 opacity-90 fw-medium text-white">
+                                    Unlimited Cloud Storage
+                                </td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-check text-primary-green fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                                <td class="py-4 border-bottom border-secondary border-opacity-25"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-start py-4 ps-4 opacity-90 fw-medium border-0 text-white">
+                                    Telegram Bot Integration <span class="badge badge-custom rounded-pill ms-2" style="font-size: 0.65rem;">Exclusive</span>
+                                </td>
+                                <td class="py-4 border-0"><i class="fa-solid fa-circle-check text-primary-green fs-4"></i></td>
+                                <td class="py-4 border-0"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                                <td class="py-4 border-0"><i class="fa-solid fa-circle-xmark text-secondary opacity-50 fs-4"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -365,7 +393,7 @@
                             </h2>
                             <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-light opacity-75">
-                                    Simply start a chat with our official Tubebox Telegram Bot, send your video file or
+                                    Simply start a chat with our official Diskly Telegram Bot, send your video file or
                                     forward it from another chat, and the bot will provide you with a direct streaming
                                     link instantly.
                                 </div>
@@ -411,55 +439,7 @@
         
     </section>\
 
-     <!-- Admin Section -->
-    <section class="py-5">
-        <div class="container py-5">
-            <div
-                class="row align-items-center bg-dark bg-opacity-50 rounded-5 p-4 p-md-5 border border-white border-opacity-10 position-relative overflow-hidden">
-                <div class="position-absolute top-0 end-0 w-50 h-100 bg-gradient-admin opacity-25"></div>
 
-                <div class="col-lg-6 position-relative z-1 mb-4 mb-lg-0">
-                    <div class="badge badge-custom rounded-pill px-3 py-2 mb-3">Admin Dashboard</div>
-                    <h2 class="display-5 fw-bold mb-4">Ultimate <span class="text-highlight">1 Admin Control</span></h2>
-                    <p class="text-light opacity-75 fs-5 mb-4">Take full charge of your platform. A single, powerful
-                        interface to manage users, moderate content, and oversee the entire ecosystem.</p>
-
-                    <div class="d-flex flex-column gap-3">
-                        <div
-                            class="d-flex align-items-center gap-3 bg-black bg-opacity-25 p-3 rounded-4 border border-white border-opacity-10">
-                            <div class="bg-primary-green bg-opacity-25 p-2 rounded-3 text-highlight">
-                                <i class="fa-solid fa-list-check fa-fw"></i>
-                            </div>
-                            <div>
-                                <h6 class="fw-bold mb-1">Content Moderation</h6>
-                                <p class="text-white small mb-0">Approve or reject Telegram uploads with one click.</p>
-                            </div>
-                        </div>
-                        <div
-                            class="d-flex align-items-center gap-3 bg-black bg-opacity-25 p-3 rounded-4 border border-white border-opacity-10">
-                            <div class="bg-primary-green bg-opacity-25 p-2 rounded-3 text-highlight">
-                                <i class="fa-solid fa-users fa-fw"></i>
-                            </div>
-                            <div>
-                                <h6 class="fw-bold mb-1">User Management</h6>
-                                <p class="text-white small mb-0">Control access, ban users, and manage permissions.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <a href="/login" class="btn btn-outline-light mt-4 rounded-pill px-4">Access Admin Panel <i
-                            class="fa-solid fa-arrow-right ms-2"></i></a>
-                </div>
-
-                <div class="col-lg-6 position-relative z-1 text-center">
-                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80"
-                        alt="Admin Dashboard"
-                        class="img-fluid rounded-4 shadow-lg border border-white border-opacity-10 opacity-75"
-                        style="transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);">
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Footer -->
     <footer class="pt-5 bg-black border-top border-secondary border-opacity-25 mt-auto">
@@ -467,10 +447,9 @@
             <div class="row g-5">
                 <!-- Col 1: Brand & Socials -->
                 <div class="col-lg-4 col-md-6">
-                    <a class="text-decoration-none fw-bold text-white fs-4 d-flex align-items-center gap-2 mb-3"
-                        href="#">
-                        <i class="fa-solid fa-play text-highlight"></i>
-                        <span>Tube<span class="text-highlight">box</span></span>
+                    <a class="text-decoration-none fw-bold text-white fs-4 d-flex align-items-center gap-2 mb-3" href="#">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Diskly Logo" style="height: 32px;" class="me-2">
+                        <span>Disk<span class="text-highlight">ly</span></span>
                     </a>
                     <p class="text-light opacity-75 mb-4 pe-lg-4">
                         Upload, share, and watch your favorite videos with unlimited storage. Built for creators and
@@ -556,7 +535,7 @@
                             </div>
                         </a>
                     </div>
-                    <p class="text-white small mb-0 text-uppercase">TUBEBOX LLC<br>123 Streaming Blvd, Suite 100<br>Web
+                    <p class="text-white small mb-0 text-uppercase">Diskly LLC<br>123 Streaming Blvd, Suite 100<br>Web
                         City, WC 12345</p>
                 </div>
             </div>
@@ -565,7 +544,7 @@
         <!-- Bottom Bar -->
         <div class="border-top border-secondary border-opacity-25 py-4">
             <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-                <p class="text-white small mb-0">&copy; 2026 TUBEBOX. All rights reserved.</p>
+                <p class="text-white small mb-0">&copy; 2026 Diskly. All rights reserved.</p>
                 <div class="d-flex gap-3 small">
                     <a href="/privacy-policy" class="text-white text-decoration-none hover-white transition-all">Privacy Policy</a>
                     <span class="text-muted">•</span>
@@ -577,6 +556,31 @@
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeBtn = document.getElementById('theme-toggle');
+            const currentTheme = localStorage.getItem('theme') || 'dark'; // Default to dark
+
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateIcon(currentTheme);
+
+            if(themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    let theme = document.documentElement.getAttribute('data-theme');
+                    let newTheme = theme === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    updateIcon(newTheme);
+                });
+            }
+
+            function updateIcon(theme) {
+                if(themeBtn) {
+                    themeBtn.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

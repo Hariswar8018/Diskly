@@ -1,19 +1,24 @@
 
 
-from flask import Flask, render_template, request, redirect, url_for,session,flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, make_response
 import os
 import requests
 import time
-from werkzeug.middleware.proxy_fix import ProxyFix
 import json
-from flask import Response
+from werkzeug.middleware.proxy_fix import ProxyFix
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 UPLOAD_FOLDER = 'static/uploads'
-app.secret_key = "pASSWORD11212121"
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "pASSWORD11212121")
+
+API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:3000")
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -38,7 +43,7 @@ def upload():
             flash("Title and video required")
             return redirect('/upload')
 
-        api_url = "https://tubeboxservers-production.up.railway.app/api/admin/videos"
+        api_url = f"{API_BASE_URL}/api/admin/videos"
 
         headers = {
             "Authorization": f"Bearer {session['token']}"
@@ -94,7 +99,7 @@ def videos_page():
     if not token:
         print("NO TOKEN → redirecting")
         return redirect('/login')
-    api_url = f"https://tubeboxservers-production.up.railway.app/api/admin/videos?_={int(time.time())}"
+    api_url = f"{API_BASE_URL}/api/admin/videos?_={int(time.time())}"
     print("BEFORE API CALL")
     headers = {
         "Authorization": f"Bearer {session['token']}",
@@ -219,7 +224,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        api_url = "https://tubeboxservers-production.up.railway.app/api/admin/login"
+        api_url = f"{API_BASE_URL}/api/admin/login"
 
         payload = {
             "username": username,
@@ -243,6 +248,46 @@ def login():
             flash("Invalid username or password")
 
     return render_template("login.html")
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    if 'token' not in session:
+        return redirect('/login')
+    api_url = f"{API_BASE_URL}/api/admin/dashboard"
+    headers = {"Authorization": f"Bearer {session['token']}"}
+    response = requests.get(api_url, headers=headers)
+    data = response.json() if response.status_code == 200 else {}
+    return render_template("admin_dashboard.html", data=data)
+
+@app.route('/superadmin/login', methods=['GET', 'POST'])
+def superadmin_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        api_url = f"{API_BASE_URL}/api/superadmin/login"
+        response = requests.post(api_url, json={"username": username, "password": password})
+        if response.status_code == 200:
+            data = response.json()
+            session['superadmin_token'] = data['token']
+            return redirect('/superadmin/dashboard')
+        else:
+            flash("Invalid superadmin credentials")
+    return render_template("superadmin_login.html")
+
+@app.route('/superadmin/dashboard')
+def superadmin_dashboard():
+    if 'superadmin_token' not in session:
+        return redirect('/superadmin/login')
+    api_url = f"{API_BASE_URL}/api/superadmin/dashboard"
+    headers = {"Authorization": f"Bearer {session['superadmin_token']}"}
+    response = requests.get(api_url, headers=headers)
+    data = response.json() if response.status_code == 200 else {}
+    return render_template("superadmin_dashboard.html", data=data)
+
+@app.route('/superadmin/logout')
+def superadmin_logout():
+    session.pop('superadmin_token', None)
+    return redirect('/superadmin/login')
 
 @app.errorhandler(404)
 def page_not_found(e):
