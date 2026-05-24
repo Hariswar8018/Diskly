@@ -71,36 +71,9 @@
 </div>
 
 <script>
-    const API = "https://Disklyservers-production.up.railway.app/api/admin/videos";
+    const videos = {{ videos | tojson | safe }};
 
-    function getToken() {
-        return localStorage.getItem("token");
-    }
-
-    async function loadVideos() {
-        try {
-            console.log("Fetching videos...");
-
-            const res = await fetch(API, {
-                headers: {
-                    "Authorization": "Bearer " + getToken()
-                }
-            });
-
-            if (!res.ok) throw new Error("API failed");
-
-            const videos = await res.json();
-            renderVideos(videos);
-
-        } catch (err) {
-            console.error(err);
-            document.getElementById("videoList").innerHTML =
-                "<p style='color:red'>Failed to load videos</p>";
-        }
-    }
-
-
-    function renderVideos(videos) {
+    function renderVideos(videoList) {
         const container = document.getElementById("videoList");
         container.innerHTML = "";
 
@@ -113,22 +86,13 @@
 
             <div class="custom-nav-container p-2 video-row"
                 style="border-radius:14px; cursor:pointer;"
-                onclick="loadVideo(
-                    '${video.id}',
-                    \`${video.title || ''}\`,
-                    \`${video.description || 'No description available.'}\`,
-                    '${video.video_url || ''}',
-                    '${video.thumbnail_url || ''}',
-                    '${video.views || 0}',
-                    '${video.likes || 0}',
-                    '${video.downloads || 0}'
-                )">
+                onclick="loadVideo('${video.id}')">
 
                 <div class="row align-items-center gx-3 gy-2">
 
                     <!-- Thumbnail -->
                     <div class="col-md-3">
-                        <img src="${video.thumbnail_url || 'https://placehold.co/500x300/041408/1f9c40?text=Diskly'}"
+                        <img src="${video.thumbnailUrl || 'https://placehold.co/500x300/041408/1f9c40?text=Diskly'}"
                              class="w-100 rounded-3"
                              style="height:95px; object-fit:cover;">
                     </div>
@@ -146,7 +110,7 @@
                         <div class="d-flex gap-3 small text-white-50 mb-2" style="font-size:12px;">
                             <span>👁 ${video.views || 0} Views</span>
                             <span>❤️ ${video.likes || 0} Likes</span>
-                            <span>⬇ ${video.downloads || 0} Downloads</span>
+                            <span>⬇ ${video.bookmarks || 0} Downloads</span>
                         </div>
 
                         <!-- Copy Box -->
@@ -183,15 +147,13 @@
     }
 
 
-    async function loadVideo(id) {
+    function loadVideo(id) {
         try {
-            const res = await fetch(API + "/" + id, {
-                headers: {
-                    "Authorization": "Bearer " + getToken()
-                }
-            });
-
-            const v = await res.json();
+            const v = videos.find(vid => vid.id == id);
+            if (!v) {
+                alert("Video not found!");
+                return;
+            }
 
             document.getElementById("emptyState").style.display = "none";
             document.getElementById("videoDetails").style.display = "block";
@@ -199,21 +161,21 @@
             const video = document.getElementById("detailVideo");
             const thumb = document.getElementById("detailThumb");
 
-            if (v.video_url) {
+            if (v.streamUrl) {
                 video.style.display = "block";
                 thumb.style.display = "none";
-                video.src = v.video_url;
+                video.src = v.streamUrl;
             } else {
                 video.style.display = "none";
                 thumb.style.display = "block";
-                thumb.src = v.thumbnail_url;
+                thumb.src = v.thumbnailUrl;
             }
 
             document.getElementById("detailTitle").innerText = v.title;
-            document.getElementById("detailDesc").innerText = v.description;
+            document.getElementById("detailDesc").innerText = v.description || 'No description available';
             document.getElementById("detailViews").innerText = "👁 " + (v.views || 0);
             document.getElementById("detailLikes").innerText = "❤️ " + (v.likes || 0);
-            document.getElementById("detailDownloads").innerText = "⬇ " + (v.downloads || 0);
+            document.getElementById("detailDownloads").innerText = "⬇ " + (v.bookmarks || 0);
 
             document.getElementById("copyBtn").onclick = () => {
                 navigator.clipboard.writeText("https://Diskly.in/" + v.id);
@@ -231,11 +193,8 @@
         if (!confirm("Delete video?")) return;
 
         try {
-            const res = await fetch(API + "/" + id, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": "Bearer " + getToken()
-                }
+            const res = await fetch(`/admin/videos/${id}`, {
+                method: "DELETE"
             });
 
             if (res.ok) {
@@ -252,12 +211,12 @@
 
     document.getElementById("searchInput").addEventListener("keyup", function () {
         const value = this.value.toLowerCase();
-        document.querySelectorAll(".video-row").forEach(el => {
+        document.querySelectorAll(".video-item").forEach(el => {
             el.style.display = el.innerText.toLowerCase().includes(value) ? "block" : "none";
         });
     });
 
-    loadVideos();
+    renderVideos(videos);
 </script>
 
 {% endblock %}

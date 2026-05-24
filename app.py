@@ -5,7 +5,9 @@ import os
 import requests
 import time
 import json
+import uuid
 from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,67 +29,18 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def home():
     return render_template("index.html")
 
-@app.route('/admin/upload', methods=['GET', 'POST'])
+@app.route('/admin/upload', methods=['GET'])
 def upload():
-
     if 'token' not in session:
         return redirect('/admin/login')
 
-    if request.method == 'POST':
-
-        title = request.form.get('title')
-        description = request.form.get('description')
-        video = request.files.get('video')
-
-        if not title or not video:
-            flash("Title and video required")
-            return redirect('/admin/upload')
-
-        api_url = f"{API_BASE_URL}/api/admin/videos"
-
-        headers = {
-            "Authorization": f"Bearer {session['token']}"
-        }
-
-        files = {
-            "video": (video.filename, video.stream, video.mimetype)
-        }
-
-        data = {
-            "title": title,
-            "description": description
-        }
-
-        response = requests.post(
-            api_url,
-            headers=headers,
-            files=files,
-            data=data
-        )
-        print(response.status_code)
-        print(response.text)
-
-        if response.status_code == 201:
-            flash("Video uploaded successfully!")
-            return redirect('/admin/upload')
-        else:
-            try:
-                flash(response.json().get("error", response.text))
-            except:
-                flash(response.text)
-
-    return render_template("admin/upload.html")
+    return render_template("admin/upload.html", token=session['token'], api_base_url=API_BASE_URL)
 
 import time
 from flask import make_response
 
 @app.route('/admin/videos')
 def videos_page():
-    # ✅ Always check session first
-    if 'token' not in session:
-        return redirect('/admin/login')
-    print("=== /videos HIT ===")
-    return render_template("admin/videos.html",);
     # ✅ Always check session first
     if 'token' not in session:
         return redirect('/admin/login')
@@ -135,6 +88,22 @@ def videos_page():
     resp.headers['Expires'] = '0'
     print("BEFORE API CALL")
     return resp
+
+@app.route('/admin/videos/<int:video_id>', methods=['DELETE'])
+def delete_video(video_id):
+    if 'token' not in session:
+        return {"error": "Unauthorized"}, 401
+    
+    api_url = f"{API_BASE_URL}/api/admin/videos/{video_id}"
+    headers = {"Authorization": f"Bearer {session['token']}"}
+    try:
+        res = requests.delete(api_url, headers=headers)
+        if res.status_code in [200, 204]:
+            return {"message": "Deleted"}, 200
+        else:
+            return {"error": res.json().get("error", "Failed to delete")}, res.status_code
+    except Exception as e:
+        return {"error": "Server connection failed"}, 500
 
 @app.route('/admin/telegram')
 def telegram():
@@ -336,6 +305,26 @@ def superadmin_dashboard():
         data = {}
         flash("Server connection failed.")
     return render_template("superadmin/dashboard.html", data=data)
+
+@app.route('/superadmin/videos', methods=['GET'])
+def superadmin_videos():
+    if 'superadmin_token' not in session:
+        return redirect('/superadmin/login')
+    
+    api_url = f"{API_BASE_URL}/api/superadmin/videos"
+    headers = {"Authorization": f"Bearer {session['superadmin_token']}"}
+    try:
+        response = requests.get(api_url, headers=headers)
+        if response.status_code == 200:
+            videos_data = response.json()
+        else:
+            videos_data = []
+            flash(response.json().get("error", "Failed to load videos."))
+    except Exception as e:
+        videos_data = []
+        flash("Server connection failed.")
+    return render_template("superadmin/videos.html", videos=videos_data)
+
 @app.route('/superadmin/admins', methods=['GET'])
 def superadmin_admins():
     if 'superadmin_token' not in session:

@@ -1,0 +1,90 @@
+{% extends 'superadmin/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <h3 class="mb-4">Global Videos</h3>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card bg-dark text-white border-secondary mb-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0 align-middle">
+                    <thead class="table-active border-secondary">
+                        <tr>
+                            <th class="ps-4">Video</th>
+                            <th>Uploader Email</th>
+                            <th>Stats (Views/Likes/Bookmarks)</th>
+                            <th>Date Uploaded</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-secondary">
+                        {% for video in videos %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="{{ video.thumbnailUrl or 'https://placehold.co/120x80/041408/1f9c40?text=No+Thumb' }}" 
+                                         alt="Thumb" class="rounded" style="width: 120px; height: 80px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="mb-1">{{ video.title }}</h6>
+                                        <small class="text-muted">ID: {{ video.id }}</small>
+                                        <br>
+                                        <a href="{{ video.streamUrl }}" target="_blank" class="text-info small text-decoration-none">
+                                            <i class="fa-solid fa-link"></i> View Stream
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ video.admin.email if video.admin else 'Unknown' }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="text-white-50 small"><i class="fa-solid fa-eye me-1"></i> {{ video.views }}</span>
+                                    <span class="text-white-50 small"><i class="fa-solid fa-heart me-1"></i> {{ video.likes }}</span>
+                                    <span class="text-white-50 small"><i class="fa-solid fa-bookmark me-1"></i> {{ video.bookmarks }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                {{ video.createdAt[:10] if video.createdAt else 'N/A' }}
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteVideo({{ video.id }})">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-film fs-2 mb-3"></i>
+                                <h5>No videos found</h5>
+                                <p>No videos have been uploaded to the platform yet.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function deleteVideo(id) {
+    if(!confirm("Are you sure you want to permanently delete this video?")) return;
+    
+    // Using the admin route to delete for now, but really this should be a superadmin route if we want true admin separation.
+    // However, since superadmin manages admins, they might need a dedicated delete route in superadmin.ts if they delete global videos.
+    // Assuming backend handles superadmin deletion logic or we add it later. For now, alert to add backend.
+    alert("Superadmin global delete functionality is restricted to backend implementation. Currently view-only.");
+}
+</script>
+{% endblock %}

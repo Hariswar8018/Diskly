@@ -5,7 +5,7 @@
 <section class="py-4">
 <div class="container-fluid">
 
-    <form method="POST" enctype="multipart/form-data">
+    <form id="uploadForm">
 
         <div class="row g-4">
 
@@ -118,9 +118,8 @@
                     {% endif %}
                     {% endwith %}
 
-                    <!-- Upload Button -->
                     <div class="d-grid mt-2">
-                        <button class="btn btn-success btn-lg rounded-4">
+                        <button type="submit" id="uploadBtn" class="btn btn-success btn-lg rounded-4">
                             <i class="fa-solid fa-cloud-arrow-up me-2"></i>
                             Upload Video
                         </button>
@@ -140,5 +139,47 @@
 
 </div>
 </section>
+
+<script>
+    const token = "{{ token }}";
+    const apiBaseUrl = "{{ api_base_url }}";
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitBtn = document.getElementById('uploadBtn');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Uploading... Please wait';
+
+        try {
+            const res = await fetch(`${apiBaseUrl}/api/admin/videos`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            const data = await res.json();
+            
+            if(res.ok) {
+                alert("Video uploaded successfully to Backblaze!");
+                window.location.href = '/admin/videos';
+            } else {
+                alert(data.error || data.details || "Upload failed");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error connecting to upload server");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    });
+</script>
 
 {% endblock %}
