@@ -458,9 +458,6 @@ def superadmin_logout():
     session.pop('superadmin_token', None)
     return redirect('/superadmin/login')
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return redirect(url_for('download'))
 
 
 if __name__ == "__main__":
