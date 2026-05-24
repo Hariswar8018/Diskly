@@ -1,0 +1,104 @@
+{% extends "superadmin/base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-white mb-1">Payout Requests</h2>
+            <p class="text-light opacity-75 small mb-0">Review and process admin withdrawal requests</p>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info rounded-4 shadow-sm border-0">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card bg-dark bg-opacity-50 border-0 rounded-4 overflow-hidden shadow-sm border border-secondary border-opacity-25">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead class="border-bottom border-secondary border-opacity-50">
+                    <tr>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0">Request ID</th>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0">Admin Info</th>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0">Payout Details</th>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0">Amount</th>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0 text-center">Status</th>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% if payouts %}
+                        {% for payout in payouts %}
+                        <tr>
+                            <td class="py-3 px-4 text-white">#{{ payout.id }}</td>
+                            <td class="py-3 px-4">
+                                <div class="fw-bold text-white">{{ payout.admin.email }}</div>
+                                <div class="small text-light opacity-50">Admin ID: {{ payout.adminId }}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="text-white fw-medium">{{ payout.paymentMethod }}</div>
+                                <div class="small text-light opacity-75">{{ payout.paymentDetails }}</div>
+                                <div class="small text-light opacity-50 mt-1">Req: {{ payout.createdAt[:10] }}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="text-white fw-bold fs-5">${{ payout.amount }}</div>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                {% if payout.status == 'PENDING' %}
+                                    <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-2">Pending</span>
+                                {% elif payout.status == 'ACCEPTED' %}
+                                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 rounded-pill px-3 py-2">Accepted</span>
+                                {% else %}
+                                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2">Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-end">
+                                {% if payout.status == 'PENDING' %}
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button class="btn btn-sm btn-outline-success px-3 rounded-pill" onclick="processPayout({{ payout.id }}, 'ACCEPTED')">Accept</button>
+                                        <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" onclick="processPayout({{ payout.id }}, 'REJECTED')">Reject</button>
+                                    </div>
+                                {% else %}
+                                    <span class="text-light opacity-50 small">Processed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-light opacity-50">No payout requests found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function processPayout(payoutId, status) {
+        if(!confirm(`Are you sure you want to mark this payout as ${status}?`)) return;
+        
+        try {
+            const res = await fetch(`/superadmin/payouts/${payoutId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: status })
+            });
+            const data = await res.json();
+            if(res.ok) {
+                window.location.reload();
+            } else {
+                alert(data.error || "Failed to process payout.");
+            }
+        } catch (e) {
+            alert("Error connecting to server.");
+        }
+    }
+</script>
+{% endblock %}

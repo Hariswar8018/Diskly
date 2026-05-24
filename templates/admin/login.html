@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Diskly</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+<link rel= "stylesheet" href= "{{ url_for('static',filename='css/style.css') }}">
+    <style>
+        .login-container {
+            min-height: calc(100vh - 100px); /* Adjust based on navbar height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background-color: rgba(4, 20, 8, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        .form-control-custom {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+        }
+        .form-control-custom:focus {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-color: var(--primary-green);
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(31, 156, 64, 0.25);
+        }
+        .form-control-custom::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .input-group-text-custom {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            border-right: none;
+            border-radius: 12px 0 0 12px;
+        }
+        .form-control-with-icon {
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+        }
+        .form-control-with-icon:focus {
+            border-left: none;
+        }
+        .input-group:focus-within .input-group-text-custom,
+        .input-group:focus-within .form-control-with-icon {
+            border-color: var(--primary-green);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar (Simplified for login page) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent pt-4">
+        <div class="container">
+            <div class="custom-nav-container w-100 d-flex justify-content-between align-items-center">
+                <a class="navbar-brand fw-bold text-white fs-4 d-flex align-items-center gap-2 mx-auto mx-lg-0" href="/">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Diskly Logo" style="height: 32px;" class="me-2">
+                    <span>Disk<span class="text-highlight">ly</span></span>
+                </a>
+                <div class="d-none d-lg-flex align-items-center gap-3">
+                    <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Theme">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <a class="nav-link text-white d-inline-block px-3" href="/"><i class="fa-solid fa-arrow-left me-2"></i>Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Section -->
+    <section class="login-container py-5">
+        <div class="container d-flex justify-content-center">
+            <div class="login-card">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary-green bg-opacity-25 rounded-circle mb-3" style="width: 60px; height: 60px;">
+                        <i class="fa-solid fa-user-shield text-highlight fs-3"></i>
+                    </div>
+                    <h2 class="fw-bold text-white mb-2">Admin Login</h2>
+                    <p class="text-light opacity-75 small">Enter your credentials to access the dashboard</p>
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    {% for message in messages %}
+                      <div class="alert alert-warning text-center">{{ message }}</div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <form  method="POST" action="/admin/login">
+                    <div class="mb-4">
+                        <label for="username" class="form-label text-light fw-medium small mb-2">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom px-3">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <input type="text" class="form-control form-control-custom form-control-with-icon shadow-none" id="username" name="username" placeholder="admin" required>
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="password" class="form-label text-light fw-medium small mb-0">Password</label>
+                            <a href="#" class="text-highlight small text-decoration-none hover-underline">Forgot?</a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom px-3">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                            <input type="password" class="form-control form-control-custom form-control-with-icon shadow-none" id="password" name="password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="mb-4 form-check d-flex align-items-center gap-2">
+                        <input type="checkbox" class="form-check-input bg-black border-secondary border-opacity-50 shadow-none mt-0" id="rememberMe">
+                        <label class="form-check-label text-light opacity-75 small pt-1" for="rememberMe">Remember me</label>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button type="submit" class="btn btn-primary-green btn-lg px-4 py-3 rounded-pill fw-bold w-100 shadow-sm d-flex justify-content-center align-items-center gap-2">
+                        Sign In <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </button>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-light opacity-75 small mb-0">Don't have an account? <a href="/admin/signup" class="text-highlight text-decoration-none fw-bold hover-underline">Sign up</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeBtn = document.getElementById('theme-toggle');
+            const currentTheme = localStorage.getItem('theme') || 'dark'; // Default to dark
+
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateIcon(currentTheme);
+
+            if(themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    let theme = document.documentElement.getAttribute('data-theme');
+                    let newTheme = theme === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    updateIcon(newTheme);
+                });
+            }
+
+            function updateIcon(theme) {
+                if(themeBtn) {
+                    themeBtn.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

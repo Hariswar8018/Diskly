@@ -35,37 +35,10 @@
         </button>
         <!-- Desktop Nav -->
         <div class="d-none d-lg-flex align-items-center gap-3">
-
-        
-
-        <a href="/superadmin/dashboard" class="text-white text-decoration-none small">
-            <i class="fa-solid fa-chart-pie me-1"></i>Dashboard
-        </a>
-
-        <div class="vr text-white"></div>
-
-        <a href="/superadmin/admins" class="text-white text-decoration-none small">
-            <i class="fa-solid fa-users me-1"></i>Admins
-        </a>
-
-        <div class="vr text-white"></div>
-        <a href="/superadmin/settings" class="text-white text-decoration-none small">
-            <i class="fa-solid fa-gear me-1"></i>Settings
-        </a>
-
-        <div class="vr text-white"></div>
-
-        <a href="/superadmin/payouts" class="text-white text-decoration-none small">
-            <i class="fa-solid fa-money-bill me-1"></i>Payouts
-        </a>
-
-        <div class="vr text-white"></div>
-
-        <a href="/superadmin/logout" class="btn btn-sm btn-danger px-3">
-            <i class="fa-solid fa-right-from-bracket me-1"></i>Logout
-        </a>
-
-    </div>
+            <a href="/admin/logout" class="btn btn-sm btn-danger px-3">
+                <i class="fa-solid fa-right-from-bracket me-1"></i>Logout
+            </a>
+        </div>
 </nav>
 
 
@@ -79,35 +52,49 @@
         <ul class="nav flex-column">
 
             <li class="nav-item py-2 border-bottom border-secondary">
-                <a href="/superadmin/dashboard" class="nav-link text-white px-0">
-                    <i class="fa-solid fa-chart-pie me-2 text-success"></i>
+                <a href="/admin/dashboard" class="nav-link text-white px-0">
+                    <i class="fa-solid fa-chart-pie me-2 text-light"></i>
                     Dashboard
                 </a>
             </li>
 
             <li class="nav-item py-2 border-bottom border-secondary">
-                <a href="/superadmin/admins" class="nav-link text-white px-0">
-                    <i class="fa-solid fa-users me-2 text-primary"></i>
-                    Manage Admins
+                <a href="/admin/upload" class="nav-link text-white px-0">
+                    <i class="fa-solid fa-cloud-arrow-up me-2 text-success"></i>
+                    Upload Video
                 </a>
             </li>
 
             <li class="nav-item py-2 border-bottom border-secondary">
-                <a href="/superadmin/settings" class="nav-link text-white px-0">
-                    <i class="fa-solid fa-gear me-2 text-info"></i>
-                    System Settings
+                <a href="/admin/videos" class="nav-link text-white px-0">
+                    <i class="fa-solid fa-film me-2 text-primary"></i>
+                    All Videos
                 </a>
             </li>
 
             <li class="nav-item py-2 border-bottom border-secondary">
-                <a href="/superadmin/payouts" class="nav-link text-white px-0">
-                    <i class="fa-solid fa-money-bill-wave me-2 text-warning"></i>
-                    Payout Requests
+                <a href="/admin/telegram" class="nav-link text-white px-0">
+                    <i class="fa-brands fa-telegram me-2 text-info"></i>
+                    Telegram Bot
+                </a>
+            </li>
+
+            <li class="nav-item py-2 border-bottom border-secondary">
+                <a href="/admin/analytics" class="nav-link text-white px-0">
+                    <i class="fa-solid fa-chart-line me-2 text-warning"></i>
+                    Analytics
+                </a>
+            </li>
+
+            <li class="nav-item py-2 border-bottom border-secondary">
+                <a href="/admin/ads" class="nav-link text-white px-0">
+                    <i class="fa-solid fa-bullhorn me-2 text-danger"></i>
+                    Ads
                 </a>
             </li>
 
             <li class="nav-item py-2">
-                <a href="/superadmin/logout" class="nav-link text-white px-0">
+                <a href="/admin/logout" class="nav-link text-white px-0">
                     <i class="fa-solid fa-right-from-bracket me-2 text-light"></i>
                     Logout
                 </a>
@@ -119,6 +106,8 @@
     <!-- MAIN CONTENT -->
     <div class="p-4 w-100">
         {% block content %}{% endblock %}
+    </div>
+
     </div>
 
 </div>

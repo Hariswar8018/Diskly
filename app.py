@@ -27,11 +27,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def home():
     return render_template("index.html")
 
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route('/admin/upload', methods=['GET', 'POST'])
 def upload():
 
     if 'token' not in session:
-        return redirect('/login')
+        return redirect('/admin/login')
 
     if request.method == 'POST':
 
@@ -41,7 +41,7 @@ def upload():
 
         if not title or not video:
             flash("Title and video required")
-            return redirect('/upload')
+            return redirect('/admin/upload')
 
         api_url = f"{API_BASE_URL}/api/admin/videos"
 
@@ -69,28 +69,28 @@ def upload():
 
         if response.status_code == 201:
             flash("Video uploaded successfully!")
-            return redirect('/upload')
+            return redirect('/admin/upload')
         else:
             try:
                 flash(response.json().get("error", response.text))
             except:
                 flash(response.text)
 
-    return render_template("upload.html")
+    return render_template("admin/upload.html")
 
 import time
 from flask import make_response
 
-@app.route('/videos')
+@app.route('/admin/videos')
 def videos_page():
     # ✅ Always check session first
     if 'token' not in session:
-        return redirect('/login')
+        return redirect('/admin/login')
     print("=== /videos HIT ===")
-    return render_template("videos.html",);
+    return render_template("admin/videos.html",);
     # ✅ Always check session first
     if 'token' not in session:
-        return redirect('/login')
+        return redirect('/admin/login')
     print("=== /videos HIT ===")
 
     token = session.get('token')
@@ -98,7 +98,7 @@ def videos_page():
 
     if not token:
         print("NO TOKEN → redirecting")
-        return redirect('/login')
+        return redirect('/admin/login')
     api_url = f"{API_BASE_URL}/api/admin/videos?_={int(time.time())}"
     print("BEFORE API CALL")
     headers = {
@@ -118,7 +118,10 @@ def videos_page():
             print("Data:", videos)
         else:
             videos = []
-            flash("Could not load videos.")
+            try:
+                flash(response.json().get("error", "Could not load videos."))
+            except:
+                flash("Could not load videos.")
 
     except Exception as e:
         print("Videos Error:", e)
@@ -126,18 +129,18 @@ def videos_page():
         flash("Server connection failed.")
 
     # ✅ Prevent browser caching
-    resp = make_response(render_template("videos.html", videos=videos))
+    resp = make_response(render_template("admin/videos.html", videos=videos))
     resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     resp.headers['Pragma'] = 'no-cache'
     resp.headers['Expires'] = '0'
     print("BEFORE API CALL")
     return resp
 
-@app.route('/telegram')
+@app.route('/admin/telegram')
 def telegram():
     if 'token' not in session:
-        return redirect('/login')
-    return render_template('telegram.html')
+        return redirect('/admin/login')
+    return render_template('admin/telegram.html')
 
 @app.route('/contact')
 def contact():
@@ -155,11 +158,11 @@ def terms():
 def why():
     return render_template('why.html')
 
-@app.route('/ads')
+@app.route('/admin/ads')
 def ads():
     if 'token' not in session:
-        return redirect('/login')
-    return render_template('ads.html')
+        return redirect('/admin/login')
+    return render_template('admin/ads.html')
 
 @app.route('/dmca')
 def dmca():
@@ -181,12 +184,12 @@ def feature():
     return render_template('feature.html')
 
 
-@app.route('/analytics')
+@app.route('/admin/analytics')
 def analytics():
     if 'token' not in session:
-        return redirect('/login')
-    return render_template('analytics.html')
-@app.route('/logout')
+        return redirect('/admin/login')
+    return render_template('admin/analytics.html')
+@app.route('/admin/logout')
 def logout():
     session.clear()
     return render_template('index.html')
@@ -217,7 +220,7 @@ def asset_links():
 
 
 
-@app.route('/login', methods=['POST','GET'])
+@app.route('/admin/login', methods=['POST','GET'])
 def login():
     if request.method == 'POST':
 
@@ -227,7 +230,7 @@ def login():
         api_url = f"{API_BASE_URL}/api/admin/login"
 
         payload = {
-            "username": username,
+            "email": username,
             "password": password
         }
 
@@ -239,25 +242,61 @@ def login():
 
             # Save everything in session
             session['token'] = data['token']
-            session['admin_id'] = data['admin']['id']
-            session['admin_username'] = data['admin']['username']
+            session['admin_email'] = data['admin']['email']
 
-            return render_template("login_success.html", token=data['token'])
+            return render_template("admin/login_success.html", token=data['token'])
 
         else:
-            flash("Invalid username or password")
+            try:
+                flash(response.json().get("error", "Invalid username or password"))
+            except:
+                flash("Invalid username or password")
 
-    return render_template("login.html")
+    return render_template("admin/login.html")
+
+@app.route('/admin/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        api_url = f"{API_BASE_URL}/api/admin/register"
+        payload = {
+            "email": email,
+            "password": password
+        }
+        response = requests.post(api_url, json=payload)
+        
+        if response.status_code == 200:
+            flash("Signup successful! Please login.")
+            return redirect('/admin/login')
+        else:
+            try:
+                flash(response.json().get("error", "Signup failed"))
+            except:
+                flash("Signup failed")
+                
+    return render_template("admin/signup.html")
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
     if 'token' not in session:
-        return redirect('/login')
+        return redirect('/admin/login')
     api_url = f"{API_BASE_URL}/api/admin/dashboard"
     headers = {"Authorization": f"Bearer {session['token']}"}
-    response = requests.get(api_url, headers=headers)
-    data = response.json() if response.status_code == 200 else {}
-    return render_template("admin_dashboard.html", data=data)
+    try:
+        response = requests.get(api_url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+        else:
+            data = {}
+            try:
+                flash(response.json().get("error", "Failed to load dashboard data."))
+            except:
+                flash("Failed to load dashboard data.")
+    except Exception as e:
+        data = {}
+        flash("Server connection failed.")
+    return render_template("admin/dashboard.html", data=data)
 
 @app.route('/superadmin/login', methods=['GET', 'POST'])
 def superadmin_login():
@@ -271,8 +310,11 @@ def superadmin_login():
             session['superadmin_token'] = data['token']
             return redirect('/superadmin/dashboard')
         else:
-            flash("Invalid superadmin credentials")
-    return render_template("superadmin_login.html")
+            try:
+                flash(response.json().get("error", "Invalid superadmin credentials"))
+            except:
+                flash("Invalid superadmin credentials")
+    return render_template("superadmin/login.html")
 
 @app.route('/superadmin/dashboard')
 def superadmin_dashboard():
@@ -280,9 +322,146 @@ def superadmin_dashboard():
         return redirect('/superadmin/login')
     api_url = f"{API_BASE_URL}/api/superadmin/dashboard"
     headers = {"Authorization": f"Bearer {session['superadmin_token']}"}
-    response = requests.get(api_url, headers=headers)
-    data = response.json() if response.status_code == 200 else {}
-    return render_template("superadmin_dashboard.html", data=data)
+    try:
+        response = requests.get(api_url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+        else:
+            data = {}
+            try:
+                flash(response.json().get("error", "Failed to load dashboard data."))
+            except:
+                flash("Failed to load dashboard data.")
+    except Exception as e:
+        data = {}
+        flash("Server connection failed.")
+    return render_template("superadmin/dashboard.html", data=data)
+@app.route('/superadmin/admins', methods=['GET'])
+def superadmin_admins():
+    if 'superadmin_token' not in session:
+        return redirect('/superadmin/login')
+    
+    api_url = f"{API_BASE_URL}/api/superadmin/admins"
+    headers = {"Authorization": f"Bearer {session['superadmin_token']}"}
+    try:
+        response = requests.get(api_url, headers=headers)
+        if response.status_code == 200:
+            admins_data = response.json()
+        else:
+            admins_data = []
+            flash(response.json().get("error", "Failed to load admins."))
+    except Exception as e:
+        admins_data = []
+        flash("Server connection failed.")
+    return render_template("superadmin/admins.html", admins=admins_data)
+
+@app.route('/superadmin/admins/limits', methods=['PUT'])
+def superadmin_admins_limits():
+    if 'superadmin_token' not in session:
+        return Response(json.dumps({"error": "Unauthorized"}), status=401, mimetype='application/json')
+    
+    api_url = f"{API_BASE_URL}/api/superadmin/admins/limits"
+    headers = {"Authorization": f"Bearer {session['superadmin_token']}"}
+    try:
+        response = requests.put(api_url, headers=headers, json=request.json)
+        return Response(response.text, status=response.status_code, mimetype='application/json')
+    except Exception as e:
+        return Response(json.dumps({"error": "Server connection failed"}), status=500, mimetype='application/json')
+
+@app.route('/superadmin/admins/<int:admin_id>/status', methods=['PUT'])
+def superadmin_admins_status(admin_id):
+    if 'superadmin_token' not in session:
+        return Response(json.dumps({"error": "Unauthorized"}), status=401, mimetype='application/json')
+    
+    api_url = f"{API_BASE_URL}/api/superadmin/admins/{admin_id}/status"
+    headers = {"Authorization": f"Bearer {session['superadmin_token']}"}
+    try:
+        response = requests.put(api_url, headers=headers, json=request.json)
+        return Response(response.text, status=response.status_code, mimetype='application/json')
+    except Exception as e:
+        return Response(json.dumps({"error": "Server connection failed"}), status=500, mimetype='application/json')
+
+@app.route('/superadmin/payouts', methods=['GET'])
+def superadmin_payouts():
+    if 'superadmin_token' not in session:
+        return redirect('/superadmin/login')
+    
+    api_url = f"{API_BASE_URL}/api/superadmin/payouts"
+    headers = {"Authorization": f"Bearer {session['superadmin_token']}"}
+    try:
+        response = requests.get(api_url, headers=headers)
+        if response.status_code == 200:
+            payouts_data = response.json()
+        else:
+            payouts_data = []
+            flash(response.json().get("error", "Failed to load payouts."))
+    except Exception as e:
+        payouts_data = []
+        flash("Server connection failed.")
+    return render_template("superadmin/payouts.html", payouts=payouts_data)
+
+@app.route('/superadmin/payouts/<int:payout_id>', methods=['PUT'])
+def superadmin_payouts_update(payout_id):
+    if 'superadmin_token' not in session:
+        return Response(json.dumps({"error": "Unauthorized"}), status=401, mimetype='application/json')
+    
+    api_url = f"{API_BASE_URL}/api/superadmin/payouts/{payout_id}"
+    headers = {"Authorization": f"Bearer {session['superadmin_token']}"}
+    try:
+        response = requests.put(api_url, headers=headers, json=request.json)
+        return Response(response.text, status=response.status_code, mimetype='application/json')
+    except Exception as e:
+        return Response(json.dumps({"error": "Server connection failed"}), status=500, mimetype='application/json')
+
+@app.route('/superadmin/settings', methods=['GET', 'POST'])
+def superadmin_settings():
+    if 'superadmin_token' not in session:
+        return redirect('/superadmin/login')
+    
+    api_url = f"{API_BASE_URL}/api/superadmin/settings"
+    headers = {"Authorization": f"Bearer {session['superadmin_token']}"}
+    
+    if request.method == 'POST':
+        try:
+            earning_rate = float(request.form.get('earningRatePer1000Views', 0))
+            telegram_enabled = request.form.get('telegramUploadEnabled') == 'on'
+            min_payout = float(request.form.get('minimumPayoutThreshold', 0))
+            
+            payload = {
+                "earningRatePer1000Views": earning_rate,
+                "telegramUploadEnabled": telegram_enabled,
+                "minimumPayoutThreshold": min_payout
+            }
+            
+            response = requests.put(api_url, headers=headers, json=payload)
+            if response.status_code == 200:
+                flash("Settings updated successfully.")
+            else:
+                try:
+                    flash(response.json().get("error", "Failed to update settings."))
+                except:
+                    flash("Failed to update settings.")
+        except ValueError:
+             flash("Invalid numeric value provided.")
+        except Exception as e:
+            flash("Server connection failed.")
+        return redirect('/superadmin/settings')
+
+    # GET request
+    try:
+        response = requests.get(api_url, headers=headers)
+        if response.status_code == 200:
+            settings_data = response.json()
+        else:
+            settings_data = {}
+            try:
+                flash(response.json().get("error", "Failed to load settings."))
+            except:
+                flash("Failed to load settings.")
+    except Exception as e:
+        settings_data = {}
+        flash("Server connection failed.")
+    return render_template("superadmin/settings.html", settings=settings_data)
 
 @app.route('/superadmin/logout')
 def superadmin_logout():

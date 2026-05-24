@@ -1,0 +1,130 @@
+{% extends "superadmin/base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-white mb-1">Admin Management</h2>
+            <p class="text-light opacity-75 small mb-0">View and manage all registered admins</p>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info rounded-4 shadow-sm border-0">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card bg-dark bg-opacity-50 border-0 rounded-4 overflow-hidden shadow-sm border border-secondary border-opacity-25">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead class="border-bottom border-secondary border-opacity-50">
+                    <tr>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0">Admin ID</th>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0">Email</th>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0">Earnings / Balance</th>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0">Limits (Daily/Monthly)</th>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0 text-center">Status</th>
+                        <th class="py-3 px-4 text-uppercase small text-light opacity-75 fw-semibold border-0 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% if admins %}
+                        {% for admin in admins %}
+                        <tr>
+                            <td class="py-3 px-4 text-white">#{{ admin.id }}</td>
+                            <td class="py-3 px-4">
+                                <div class="fw-bold text-white">{{ admin.email }}</div>
+                                <div class="small text-light opacity-50">Joined: {{ admin.createdAt[:10] }}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="text-white fw-bold">${{ admin.totalEarnings }}</div>
+                                <div class="small text-warning">Bal: ${{ admin.balance }}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <input type="number" id="daily_{{ admin.id }}" class="form-control form-control-sm bg-black text-white border-secondary" value="{{ admin.dailyUploadLimit }}" style="width: 80px;" title="Daily Limit">
+                                    <span class="text-muted">/</span>
+                                    <input type="number" id="monthly_{{ admin.id }}" class="form-control form-control-sm bg-black text-white border-secondary" value="{{ admin.monthlyUploadLimit }}" style="width: 80px;" title="Monthly Limit">
+                                    <button class="btn btn-sm btn-outline-success" onclick="updateLimits({{ admin.id }})" title="Save Limits">
+                                        <i class="fa-solid fa-save"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                {% if admin.isActive %}
+                                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 rounded-pill px-3 py-2">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2">Disabled</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-end">
+                                {% if admin.isActive %}
+                                    <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" onclick="toggleStatus({{ admin.id }}, false)">Disable</button>
+                                {% else %}
+                                    <button class="btn btn-sm btn-outline-success px-3 rounded-pill" onclick="toggleStatus({{ admin.id }}, true)">Activate</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-light opacity-50">No admins found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function updateLimits(adminId) {
+        const daily = document.getElementById(`daily_${adminId}`).value;
+        const monthly = document.getElementById(`monthly_${adminId}`).value;
+        
+        try {
+            const res = await fetch('/superadmin/admins/limits', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminIds: [adminId],
+                    dailyUploadLimit: parseInt(daily),
+                    monthlyUploadLimit: parseInt(monthly)
+                })
+            });
+            const data = await res.json();
+            if(res.ok) {
+                alert("Limits updated successfully!");
+            } else {
+                alert(data.error || "Failed to update limits.");
+            }
+        } catch (e) {
+            alert("Error connecting to server.");
+        }
+    }
+
+    async function toggleStatus(adminId, isActive) {
+        if(!confirm(`Are you sure you want to ${isActive ? 'activate' : 'disable'} this admin?`)) return;
+        
+        try {
+            const res = await fetch(`/superadmin/admins/${adminId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isActive: isActive })
+            });
+            const data = await res.json();
+            if(res.ok) {
+                window.location.reload();
+            } else {
+                alert(data.error || "Failed to update status.");
+            }
+        } catch (e) {
+            alert("Error connecting to server.");
+        }
+    }
+</script>
+{% endblock %}
