@@ -19,7 +19,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 UPLOAD_FOLDER = 'static/uploads'
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "pASSWORD11212121")
 
-API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:3000")
+API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:3000").rstrip('/')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -44,16 +44,17 @@ def videos_page():
     # ✅ Always check session first
     if 'token' not in session:
         return redirect('/admin/login')
-    print("=== /videos HIT ===")
+    print("=== /videos HIT ===", flush=True)
 
     token = session.get('token')
-    print("TOKEN:", token)
+    print("TOKEN:", token, flush=True)
 
     if not token:
-        print("NO TOKEN → redirecting")
+        print("NO TOKEN → redirecting", flush=True)
         return redirect('/admin/login')
+    
     api_url = f"{API_BASE_URL}/api/admin/videos?_={int(time.time())}"
-    print("BEFORE API CALL")
+    print("BEFORE API CALL", flush=True)
     headers = {
         "Authorization": f"Bearer {session['token']}",
         "Cache-Control": "no-cache, no-store, must-revalidate",
@@ -64,11 +65,11 @@ def videos_page():
     try:
         response = requests.get(api_url, timeout=20, headers=headers)
 
-        print("Status:", response.status_code)
+        print("Status:", response.status_code, flush=True)
 
         if response.status_code == 200:
             videos = response.json()
-            print("Data:", videos)
+            print("Data:", videos, flush=True)
         else:
             videos = []
             try:
@@ -109,7 +110,7 @@ def delete_video(video_id):
 def telegram():
     if 'token' not in session:
         return redirect('/admin/login')
-    return render_template('admin/telegram.html')
+    return render_template('admin/telegram.html', api_base_url=API_BASE_URL)
 
 @app.route('/contact')
 def contact():
