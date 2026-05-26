@@ -90,19 +90,23 @@ def videos_page():
     print("BEFORE API CALL")
     return resp
 
-@app.route('/admin/videos/<int:video_id>', methods=['DELETE'])
-def delete_video(video_id):
+@app.route('/admin/videos/<int:video_id>', methods=['DELETE', 'PUT'])
+def modify_video(video_id):
     if 'token' not in session:
         return {"error": "Unauthorized"}, 401
     
     api_url = f"{API_BASE_URL}/api/admin/videos/{video_id}"
     headers = {"Authorization": f"Bearer {session['token']}"}
     try:
-        res = requests.delete(api_url, headers=headers)
+        if request.method == 'DELETE':
+            res = requests.delete(api_url, headers=headers)
+        elif request.method == 'PUT':
+            res = requests.put(api_url, headers=headers, json=request.json)
+            
         if res.status_code in [200, 204]:
-            return {"message": "Deleted"}, 200
+            return {"message": "Success"}, 200
         else:
-            return {"error": res.json().get("error", "Failed to delete")}, res.status_code
+            return {"error": res.json().get("error", "Action failed")}, res.status_code
     except Exception as e:
         return {"error": "Server connection failed"}, 500
 
@@ -251,22 +255,42 @@ def signup():
 def admin_dashboard():
     if 'token' not in session:
         return redirect('/admin/login')
-    api_url = f"{API_BASE_URL}/api/admin/dashboard"
+    
     headers = {"Authorization": f"Bearer {session['token']}"}
+    data = {}
+    reports_data = {}
+    
     try:
-        response = requests.get(api_url, headers=headers)
-        if response.status_code == 200:
-            data = response.json()
-        else:
-            data = {}
-            try:
-                flash(response.json().get("error", "Failed to load dashboard data."))
-            except:
-                flash("Failed to load dashboard data.")
+        # Fetch Dashboard Stats
+        res_dash = requests.get(f"{API_BASE_URL}/api/admin/dashboard", headers=headers)
+        if res_dash.status_code == 200:
+            data = res_dash.json()
+            
+        # Fetch Reports Data
+        res_rep = requests.get(f"{API_BASE_URL}/api/admin/reports", headers=headers)
+        if res_rep.status_code == 200:
+            reports_data = res_rep.json()
+            
     except Exception as e:
-        data = {}
         flash("Server connection failed.")
-    return render_template("admin/dashboard.html", data=data)
+        
+    return render_template("admin/dashboard.html", data=data, reports=reports_data)
+
+@app.route('/admin/account')
+def admin_account():
+    if 'token' not in session:
+        return redirect('/admin/login')
+    
+    headers = {"Authorization": f"Bearer {session['token']}"}
+    account_data = {}
+    try:
+        res = requests.get(f"{API_BASE_URL}/api/admin/account", headers=headers)
+        if res.status_code == 200:
+            account_data = res.json()
+    except:
+        pass
+        
+    return render_template("admin/account.html", account=account_data, token=session['token'], api_base_url=API_BASE_URL)
 
 @app.route('/superadmin/login', methods=['GET', 'POST'])
 def superadmin_login():
@@ -290,22 +314,24 @@ def superadmin_login():
 def superadmin_dashboard():
     if 'superadmin_token' not in session:
         return redirect('/superadmin/login')
-    api_url = f"{API_BASE_URL}/api/superadmin/dashboard"
+        
     headers = {"Authorization": f"Bearer {session['superadmin_token']}"}
+    data = {}
+    reports_data = {}
+    
     try:
-        response = requests.get(api_url, headers=headers)
-        if response.status_code == 200:
-            data = response.json()
-        else:
-            data = {}
-            try:
-                flash(response.json().get("error", "Failed to load dashboard data."))
-            except:
-                flash("Failed to load dashboard data.")
+        res_dash = requests.get(f"{API_BASE_URL}/api/superadmin/dashboard", headers=headers)
+        if res_dash.status_code == 200:
+            data = res_dash.json()
+            
+        res_rep = requests.get(f"{API_BASE_URL}/api/superadmin/reports", headers=headers)
+        if res_rep.status_code == 200:
+            reports_data = res_rep.json()
+            
     except Exception as e:
-        data = {}
         flash("Server connection failed.")
-    return render_template("superadmin/dashboard.html", data=data)
+        
+    return render_template("superadmin/dashboard.html", data=data, reports=reports_data)
 
 @app.route('/superadmin/videos', methods=['GET'])
 def superadmin_videos():

@@ -12,6 +12,21 @@
         {% endif %}
     {% endwith %}
 
+    <!-- Search & Filter -->
+    <div class="row mb-4 g-2">
+        <div class="col-md-8">
+            <input id="searchInput" class="form-control bg-dark text-white border-secondary" placeholder="Search videos by title or description...">
+        </div>
+        <div class="col-md-4">
+            <select id="sortSelect" class="form-select bg-dark text-white border-secondary">
+                <option value="newest">Newest First</option>
+                <option value="views">Most Views</option>
+                <option value="likes">Most Likes</option>
+                <option value="downloads">Most Downloads</option>
+            </select>
+        </div>
+    </div>
+
     <div class="card bg-dark text-white border-secondary mb-4">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -25,9 +40,15 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody class="border-secondary">
+                    <tbody class="border-secondary" id="videoTableBody">
                         {% for video in videos %}
-                        <tr>
+                        <tr class="video-row" 
+                            data-title="{{ video.title | lower }}" 
+                            data-description="{{ video.description | lower if video.description else '' }}"
+                            data-views="{{ video.views }}" 
+                            data-likes="{{ video.likes }}" 
+                            data-downloads="{{ video.bookmarks }}"
+                            data-id="{{ video.id }}">
                             <td class="ps-4">
                                 <div class="d-flex align-items-center gap-3">
                                     <img src="{{ video.thumbnailUrl or 'https://placehold.co/120x80/041408/1f9c40?text=No+Thumb' }}" 
@@ -80,11 +101,31 @@
 <script>
 async function deleteVideo(id) {
     if(!confirm("Are you sure you want to permanently delete this video?")) return;
-    
-    // Using the admin route to delete for now, but really this should be a superadmin route if we want true admin separation.
-    // However, since superadmin manages admins, they might need a dedicated delete route in superadmin.ts if they delete global videos.
-    // Assuming backend handles superadmin deletion logic or we add it later. For now, alert to add backend.
     alert("Superadmin global delete functionality is restricted to backend implementation. Currently view-only.");
 }
+
+document.getElementById("searchInput").addEventListener("keyup", function () {
+    const value = this.value.toLowerCase();
+    document.querySelectorAll(".video-row").forEach(el => {
+        const t = el.getAttribute("data-title");
+        const d = el.getAttribute("data-description");
+        el.style.display = (t.includes(value) || d.includes(value)) ? "" : "none";
+    });
+});
+
+document.getElementById("sortSelect").addEventListener("change", function() {
+    const val = this.value;
+    const container = document.getElementById("videoTableBody");
+    const items = Array.from(container.getElementsByClassName("video-row"));
+    
+    items.sort((a, b) => {
+        if (val === 'views') return parseInt(b.dataset.views) - parseInt(a.dataset.views);
+        if (val === 'likes') return parseInt(b.dataset.likes) - parseInt(a.dataset.likes);
+        if (val === 'downloads') return parseInt(b.dataset.downloads) - parseInt(a.dataset.downloads);
+        return parseInt(b.dataset.id) - parseInt(a.dataset.id);
+    });
+    
+    items.forEach(item => container.appendChild(item));
+});
 </script>
 {% endblock %}

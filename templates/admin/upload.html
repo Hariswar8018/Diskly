@@ -41,7 +41,9 @@
 
                         <input type="file"
                                name="video"
+                               id="videoInput"
                                class="form-control form-control-lg"
+                               onchange="autoFillTitle(this)"
                                required>
 
                     </div>
@@ -96,9 +98,9 @@
                     <label class="fw-semibold mb-2">Video Title</label>
                     <input type="text"
                            name="title"
+                           id="titleInput"
                            class="form-control form-control-lg mb-4"
-                           placeholder="Enter video title"
-                           required>
+                           placeholder="Enter video title (defaults to file name)">
 
                     <!-- Description -->
                     <label class="fw-semibold mb-2">Description</label>
@@ -143,6 +145,16 @@
 <script>
     const token = "{{ token }}";
     const apiBaseUrl = "{{ api_base_url }}";
+
+    function autoFillTitle(input) {
+        const titleInput = document.getElementById('titleInput');
+        if (input.files.length > 0 && !titleInput.value) {
+            let filename = input.files[0].name;
+            // remove extension
+            filename = filename.replace(/\.[^/.]+$/, "");
+            titleInput.value = filename;
+        }
+    }
 
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         e.preventDefault();

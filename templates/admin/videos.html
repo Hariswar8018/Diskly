@@ -25,9 +25,19 @@
 
     <h3 class="mb-4">🎬 Videos</h3>
 
-    <!-- Search -->
-    <div class="mb-4">
-        <input id="searchInput" class="form-control" placeholder="Search videos...">
+    <!-- Search & Filter -->
+    <div class="row mb-4 g-2">
+        <div class="col-md-8">
+            <input id="searchInput" class="form-control" placeholder="Search videos by title or description...">
+        </div>
+        <div class="col-md-4">
+            <select id="sortSelect" class="form-select">
+                <option value="newest">Newest First</option>
+                <option value="views">Most Views</option>
+                <option value="likes">Most Likes</option>
+                <option value="downloads">Most Downloads</option>
+            </select>
+        </div>
     </div>
 
     <div class="row">
@@ -59,7 +69,10 @@
                         <span id="detailDownloads"></span>
                     </div>
 
-                    <button class="btn btn-success w-100 mb-2" id="copyBtn">Copy Link</button>
+                    <div class="d-flex gap-2 mb-2">
+                        <button class="btn btn-success w-100" id="copyBtn">Copy Link</button>
+                        <button class="btn btn-warning w-100" id="editBtn" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
+                    </div>
                     <button class="btn btn-danger w-100" id="deleteBtn">Delete</button>
 
                 </div>
@@ -68,6 +81,32 @@
         </div>
 
     </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title">Edit Video</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+            <input type="hidden" id="editVideoId">
+            <div class="mb-3">
+                <label class="form-label">Title</label>
+                <input type="text" id="editTitle" class="form-control bg-secondary text-white border-0" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea id="editDescription" class="form-control bg-secondary text-white border-0" rows="4"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -82,7 +121,11 @@
             const html = `
         <div class="col-12 video-item"
             data-title="${(video.title || '').toLowerCase()}"
-            data-description="${(video.description || '').toLowerCase()}">
+            data-description="${(video.description || '').toLowerCase()}"
+            data-views="${video.views || 0}"
+            data-likes="${video.likes || 0}"
+            data-downloads="${video.bookmarks || 0}"
+            data-id="${video.id}">
 
             <div class="custom-nav-container p-2 video-row"
                 style="border-radius:14px; cursor:pointer;"
@@ -182,6 +225,10 @@
                 alert("Copied!");
             };
 
+            document.getElementById("editVideoId").value = v.id;
+            document.getElementById("editTitle").value = v.title;
+            document.getElementById("editDescription").value = v.description || '';
+
             document.getElementById("deleteBtn").onclick = () => deleteVideo(v.id);
 
         } catch (err) {
@@ -212,8 +259,51 @@
     document.getElementById("searchInput").addEventListener("keyup", function () {
         const value = this.value.toLowerCase();
         document.querySelectorAll(".video-item").forEach(el => {
-            el.style.display = el.innerText.toLowerCase().includes(value) ? "block" : "none";
+            const t = el.getAttribute("data-title");
+            const d = el.getAttribute("data-description");
+            el.style.display = (t.includes(value) || d.includes(value)) ? "block" : "none";
         });
+    });
+    
+    document.getElementById("sortSelect").addEventListener("change", function() {
+        const val = this.value;
+        const container = document.getElementById("videoList");
+        const items = Array.from(container.getElementsByClassName("video-item"));
+        
+        items.sort((a, b) => {
+            if (val === 'views') return parseInt(b.dataset.views) - parseInt(a.dataset.views);
+            if (val === 'likes') return parseInt(b.dataset.likes) - parseInt(a.dataset.likes);
+            if (val === 'downloads') return parseInt(b.dataset.downloads) - parseInt(a.dataset.downloads);
+            // Default to newest (we use ID as proxy for date here since they are appended in order)
+            return parseInt(b.dataset.id) - parseInt(a.dataset.id);
+        });
+        
+        container.innerHTML = "";
+        items.forEach(item => container.appendChild(item));
+    });
+
+    document.getElementById("editForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const id = document.getElementById("editVideoId").value;
+        const title = document.getElementById("editTitle").value;
+        const description = document.getElementById("editDescription").value;
+        
+        try {
+            const res = await fetch(`/admin/videos/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, description })
+            });
+
+            if (res.ok) {
+                alert("Saved!");
+                window.location.reload();
+            } else {
+                alert("Failed to save changes");
+            }
+        } catch(err) {
+            alert("Server error");
+        }
     });
 
     function copyDiskly(downloadKey, element) {

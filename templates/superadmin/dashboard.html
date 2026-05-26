@@ -17,8 +17,8 @@
                     <i class="fa-solid fa-users-gear fa-4x text-primary-accent"></i>
                 </div>
                 <div class="position-relative z-1">
-                    <p class="text-light opacity-75 text-uppercase small fw-bold mb-2">Total Admins</p>
-                    <h3 class="text-white fw-bold mb-0">{{ data.get('totalAdmins', 0) }}</h3>
+                    <p class="text-light opacity-75 text-uppercase small fw-bold mb-2">Admins (Total / Active)</p>
+                    <h3 class="text-white fw-bold mb-0">{{ data.get('totalAdmins', 0) }} / <span class="text-success">{{ data.get('activeAdmins', 0) }}</span></h3>
                 </div>
             </div>
         </div>
@@ -55,6 +55,33 @@
                 <div class="position-relative z-1">
                     <p class="text-light opacity-75 text-uppercase small fw-bold mb-2">Total Platform Views</p>
                     <h3 class="text-white fw-bold mb-0">{{ data.get('engagements', {}).get('views', 0) }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extra Reports Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card bg-dark bg-opacity-50 border-0 h-100 rounded-4 p-4 position-relative overflow-hidden">
+                <div class="position-absolute top-0 end-0 p-3 opacity-25">
+                    <i class="fa-solid fa-download fa-4x text-info"></i>
+                </div>
+                <div class="position-relative z-1">
+                    <p class="text-light opacity-75 text-uppercase small fw-bold mb-2">Total Downloads</p>
+                    <h3 class="text-white fw-bold mb-0">{{ reports.get('totals', {}).get('totalDownloads', 0) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-dark bg-opacity-50 border-0 h-100 rounded-4 p-4 position-relative overflow-hidden">
+                <div class="position-absolute top-0 end-0 p-3 opacity-25">
+                    <i class="fa-solid fa-eye fa-4x text-warning"></i>
+                </div>
+                <div class="position-relative z-1">
+                    <p class="text-light opacity-75 text-uppercase small fw-bold mb-2">Ads Views</p>
+                    <h3 class="text-white fw-bold mb-0">N/A (Coming Soon)</h3>
+                    <p class="small text-muted mb-0">System metric aggregation pending</p>
                 </div>
             </div>
         </div>

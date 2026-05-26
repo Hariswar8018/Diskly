@@ -1,0 +1,81 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <h3 class="mb-4">👤 Account Settings</h3>
+    
+    <div class="card bg-dark text-white p-4" style="border-radius: 12px;">
+        <form id="accountForm">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <img id="previewPic" src="{{ account.profilePic if account and account.profilePic else 'https://placehold.co/150x150?text=Profile' }}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #28a745;">
+                    <br>
+                    <label class="btn btn-sm btn-outline-success mt-2">
+                        Change Picture
+                        <input type="file" name="profilePic" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                    </label>
+                </div>
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control bg-secondary text-white" value="{{ account.email if account else '' }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ account.name if account and account.name else '' }}" placeholder="Enter your full name">
+                    </div>
+                    
+                    <button type="submit" id="saveBtn" class="btn btn-success mt-3 w-100">Save Changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const token = "{{ token }}";
+    const apiBaseUrl = "{{ api_base_url }}";
+
+    function previewImage(event) {
+        if(event.target.files.length > 0) {
+            const src = URL.createObjectURL(event.target.files[0]);
+            document.getElementById('previewPic').src = src;
+        }
+    }
+
+    document.getElementById('accountForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitBtn = document.getElementById('saveBtn');
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Saving...';
+
+        try {
+            const res = await fetch(`${apiBaseUrl}/api/admin/account`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if(res.ok) {
+                alert("Account updated successfully!");
+                window.location.reload();
+            } else {
+                const data = await res.json();
+                alert(data.error || "Update failed");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error connecting to server");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Save Changes';
+        }
+    });
+</script>
+{% endblock %}
