@@ -25,6 +25,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
 @app.route('/')
 def home():
     return render_template("index.html")
@@ -167,10 +172,6 @@ def analytics():
 def logout():
     session.clear()
     return render_template('index.html')
-@app.route('/app')
-def download():
-    return redirect("https://play.google.com/store/apps/details?id=com.tube.box.entertainment.app&hl=en_IN")
-
 
 
 @app.route('/.well-known/assetlinks.json')
@@ -484,7 +485,9 @@ def superadmin_logout():
     session.pop('superadmin_token', None)
     return redirect('/superadmin/login')
 
-
+@app.route('/app')
+def apps():
+    return redirect("https://play.google.com/store/apps/details?id=com.starwish.diskly")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))

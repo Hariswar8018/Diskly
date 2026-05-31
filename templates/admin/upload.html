@@ -28,7 +28,7 @@
                     </div>
 
                     <!-- Upload Box -->
-                    <div class="bg-light rounded-4 p-5 text-center border">
+                    <div class="bg-secondary rounded-4 p-5 text-center border border-secondary border-opacity-25">
 
                         <i class="fa-solid fa-film text-secondary mb-3"
                            style="font-size:50px;"></i>
@@ -52,21 +52,21 @@
                     <div class="row text-center mt-4 g-3">
 
                         <div class="col-md-4">
-                            <div class="bg-light rounded-4 p-3">
+                            <div class="bg-secondary border border-secondary border-opacity-25 rounded-4 p-3">
                                 <i class="fa-solid fa-file-video text-primary mb-2"></i>
                                 <div class="small fw-bold">Choose File</div>
                             </div>
                         </div>
 
                         <div class="col-md-4">
-                            <div class="bg-light rounded-4 p-3">
+                            <div class="bg-secondary border border-secondary border-opacity-25 rounded-4 p-3">
                                 <i class="fa-solid fa-pen text-warning mb-2"></i>
                                 <div class="small fw-bold">Add Details</div>
                             </div>
                         </div>
 
                         <div class="col-md-4">
-                            <div class="bg-light rounded-4 p-3">
+                            <div class="bg-secondary border border-secondary border-opacity-25 rounded-4 p-3">
                                 <i class="fa-solid fa-check text-success mb-2"></i>
                                 <div class="small fw-bold">Publish</div>
                             </div>
@@ -139,8 +139,44 @@
 
     </form>
 
+    <!-- Mobile Telegram Upload Alert -->
+    <div id="mobileUploadAlert" class="position-fixed top-0 start-0 w-100 h-100 bg-black bg-opacity-75 d-none align-items-center justify-content-center" style="z-index: 9999; backdrop-filter: blur(5px);">
+        <div class="bg-secondary rounded-4 p-4 m-3 shadow-lg border border-success border-opacity-25 text-center" style="max-width: 400px; position: relative;">
+            <i class="fa-brands fa-telegram text-primary mb-2" style="font-size: 55px;"></i>
+            <h4 class="fw-bold mt-2 mb-2">Better on Mobile!</h4>
+            <p class="text-muted small mb-4" style="line-height: 1.6;">
+                Uploading videos through our Telegram bot is much faster and more reliable on mobile devices than using the web browser.
+            </p>
+            <div class="d-grid gap-2">
+                <a href="/admin/telegram" class="btn btn-primary-green rounded-pill fw-bold py-2">
+                    <i class="fa-brands fa-telegram me-2"></i> Upload via Telegram
+                </a>
+                <button class="btn btn-outline-dark-custom rounded-pill py-2" onclick="dismissMobileAlert()">
+                    Continue in Browser
+                </button>
+            </div>
+        </div>
+    </div>
+
 </div>
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        if (window.innerWidth <= 768 && !sessionStorage.getItem('hideMobileTelegramAlert')) {
+            const alertBox = document.getElementById('mobileUploadAlert');
+            alertBox.classList.remove('d-none');
+            alertBox.classList.add('d-flex');
+        }
+    });
+
+    function dismissMobileAlert() {
+        const alertBox = document.getElementById('mobileUploadAlert');
+        alertBox.classList.remove('d-flex');
+        alertBox.classList.add('d-none');
+        sessionStorage.setItem('hideMobileTelegramAlert', 'true'); // Hide for current session
+    }
+</script>
 
 <script>
     const token = "{{ token }}";

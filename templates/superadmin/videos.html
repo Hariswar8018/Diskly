@@ -15,10 +15,10 @@
     <!-- Search & Filter -->
     <div class="row mb-4 g-2">
         <div class="col-md-8">
-            <input id="searchInput" class="form-control bg-dark text-white border-secondary" placeholder="Search videos by title or description...">
+            <input id="searchInput" class="form-control bg-secondary text-white border-secondary" placeholder="Search videos by title or description...">
         </div>
         <div class="col-md-4">
-            <select id="sortSelect" class="form-select bg-dark text-white border-secondary">
+            <select id="sortSelect" class="form-select bg-secondary text-white border-secondary">
                 <option value="newest">Newest First</option>
                 <option value="views">Most Views</option>
                 <option value="likes">Most Likes</option>
@@ -27,10 +27,10 @@
         </div>
     </div>
 
-    <div class="card bg-dark text-white border-secondary mb-4">
+    <div class="card bg-secondary text-white border-secondary mb-4">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-dark table-hover mb-0 align-middle">
+                <table class="table custom-comparison-table table-hover mb-0 align-middle">
                     <thead class="table-active border-secondary">
                         <tr>
                             <th class="ps-4">Video</th>
@@ -68,9 +68,9 @@
                             </td>
                             <td>
                                 <div class="d-flex flex-column gap-1">
-                                    <span class="text-white-50 small"><i class="fa-solid fa-eye me-1"></i> {{ video.views }}</span>
-                                    <span class="text-white-50 small"><i class="fa-solid fa-heart me-1"></i> {{ video.likes }}</span>
-                                    <span class="text-white-50 small"><i class="fa-solid fa-bookmark me-1"></i> {{ video.bookmarks }}</span>
+                                    <span class="small opacity-75"><i class="fa-solid fa-eye me-1"></i> {{ video.views }}</span>
+                                    <span class="small opacity-75"><i class="fa-solid fa-heart me-1"></i> {{ video.likes }}</span>
+                                    <span class="small opacity-75"><i class="fa-solid fa-bookmark me-1"></i> {{ video.bookmarks }}</span>
                                 </div>
                             </td>
                             <td>
